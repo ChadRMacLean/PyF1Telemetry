@@ -7,18 +7,17 @@ class Header:
     packet_header_format = "HBBBBQfLBB"
     packet_format = little_endian + packet_header_format
 
-    def __init__(self): 
-        self.m_packetFormat = 0
-        self.m_gameMajorVersion = 0
-        self.m_gameMinorVersion = 0
-        self.m_packetVersion = 0
-        self.m_packetId = 0
-        self.m_sessionUID = 0
-        self.m_sessionTime = 0
-        self.m_frameIdentifier = 0
-        self.m_playerCarIndex = 0
-        self.m_secondaryPlayerCarIndex = 0
-        
+    m_packetFormat = 0
+    m_gameMajorVersion = 0
+    m_gameMinorVersion = 0
+    m_packetVersion = 0
+    m_packetId = 0
+    m_sessionUID = 0
+    m_sessionTime = 0
+    m_frameIdentifier = 0
+    m_playerCarIndex = 0
+    m_secondaryPlayerCarIndex = 0
+
 
     def unpack_struct(self, format, data):
         unpacked = struct.unpack_from(format, data)

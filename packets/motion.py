@@ -49,12 +49,12 @@ class CarMotionData:
 
 
 class PacketMotionData:
+    
+    car_motion_data_format = "ffffffHHHHHHffffff"
+    extra_player_car_format = "fffffffffffffff"
 
     def __init__(self):
-        self.car_motion_data_format = "ffffffHHHHHHffffff"
-        self.extra_player_car_format = "fffffffffffffff"
-
-        self.m_carMotionData = [CarMotionData for x in range(22)]
+        self.m_carMotionData = [CarMotionData() for x in range(22)]
         
         self.packet_format = "".join(self.car_motion_data_format * 22) + self.extra_player_car_format
         
@@ -73,8 +73,6 @@ class PacketMotionData:
         self.m_angularAccelerationZ = ctypes.c_float(0)
         self.m_frontWheelsAngle = ctypes.c_float(0)
 
-        # self.packet_format = header.packet_header_format + self.car_motion_data_format
-
 
     def unpack_struct(self, format, data):
         # Unpack packet with provided format and data.
@@ -92,7 +90,7 @@ class PacketMotionData:
         car_data_list = [unpacked[i*car_data_buffer:(i*car_data_buffer) + car_data_buffer] for i in range(number_of_cars)]
 
         for index, car in enumerate(self.m_carMotionData):
-            car.update(car, car_data_list[index])
+            car.update(car_data_list[index])
         
         return unpacked
 

@@ -37,26 +37,18 @@ class CarTelemetryData:
         self.m_brakesTemperature = [ctypes.c_uint16(data[i]) for i in range(9, 13)]
         self.m_tyresSurfaceTemperature = [ctypes.c_uint8(data[i]) for i in range(13, 17)]
         self.m_tyresInnerTemperature = [ctypes.c_uint8(data[i]) for i in range(17, 21)]
-        self.m_engineTemperature = ctypes.c_uint16(data[22])
-        self.m_tyrePressure = [ctypes.c_float(data[i]) for i in range(23, 27)]
-        self.m_surfaceType = [ctypes.c_uint8(data[i]) for i in range(27, 31)]
-
-
-# b = int8
-# B = uint8
-# H = uint16
-# L = uint32
-# Q = uint64
-# f = float
+        self.m_engineTemperature = ctypes.c_uint16(data[21])
+        self.m_tyrePressure = [ctypes.c_float(data[i]) for i in range(22, 26)]
+        self.m_surfaceType = [ctypes.c_uint8(data[i]) for i in range(26, 30)]
 
 
 class PacketCarTelemetryData:
+    
+    car_telemetry_data_format = "HfffBbHBBHHHHBBBBBBBBHffffBBBB"
+    extra_telemetry_data_format = "LBBb"
 
     def __init__(self):
-        self.car_telemetry_data_format = "HfffBbHBBHHHHBBBBBBBBHffffBBBB"
-        self.extra_telemetry_data_format = "LBBb"
-
-        self.m_carTelemetryData = [CarTelemetryData for x in range(22)]
+        self.m_carTelemetryData = [CarTelemetryData() for x in range(22)]
         
         self.packet_format = "".join(self.car_telemetry_data_format * 22) + self.extra_telemetry_data_format
         
@@ -80,11 +72,9 @@ class PacketCarTelemetryData:
         number_of_cars = int((len(unpacked) - len(self.extra_telemetry_data_format)) / car_data_buffer)
 
         car_data_list = [unpacked[i*car_data_buffer:(i*car_data_buffer) + car_data_buffer] for i in range(number_of_cars)]
-        
-        print("Speed: " + str(car_data_list[0][0]))
 
-        # for index, car in enumerate(self.m_carTelemetryData):
-        #     car.update(car, car_data_list[index])
+        for index, car in enumerate(self.m_carTelemetryData):
+            car.update(car_data_list[index])
         
         return unpacked
         
