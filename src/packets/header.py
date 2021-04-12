@@ -6,7 +6,7 @@ class Header:
     little_endian = "<"
     packet_header_format = "HBBBBQfLBB"
     packet_format = little_endian + packet_header_format
-
+    
     m_packetFormat = 0
     m_gameMajorVersion = 0
     m_gameMinorVersion = 0
@@ -17,7 +17,7 @@ class Header:
     m_frameIdentifier = 0
     m_playerCarIndex = 0
     m_secondaryPlayerCarIndex = 0
-
+        
 
     def unpack_struct(self, format, data):
         unpacked = struct.unpack_from(format, data)

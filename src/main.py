@@ -1,7 +1,15 @@
-import sock
 import curses
 import time
+import sys
 
+import socketserver
+import http.server
+import socket
+import json
+
+from backend import data 
+
+from packets import cmsocket
 from packets import header
 from packets import motion
 from packets import telemetry
@@ -13,22 +21,61 @@ from packets import telemetry
 # Q = uint64
 # f = float
 
+class Handler(http.server.SimpleHTTPRequestHandler):
+    
+    def do_GET(self):
+        if self.path == "/" : self.path = "/src/frontend/"
+        
+        if self.path == "/src/backend/data.py" : 
+            self.respond(Main.get_telemetry(Main))
+            return http.server.SimpleHTTPRequestHandler.do_HEAD(self)
+            
+        return http.server.SimpleHTTPRequestHandler.do_GET(self)
+    
+    
+    def handle_http(self, data):
+        self.send_response_only(200)
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+        
+        print(data)
+        
+        return bytes(data, "utf8")
+    
+    
+    def respond(self, data):
+        response = self.handle_http(data)
+        self.wfile.write(response)
+        
+
 class Main:
     
+    port = 20775
+    
     struct_size = 9914
+    
+    obj_sock = cmsocket.CMSocket()
+    obj_header = header.Header()
+    obj_motion = motion.PacketMotionData()
+    obj_telemetry = telemetry.PacketCarTelemetryData()
 
     def __init__(self):
-        self.sock = sock.Socket()
-        self.obj_header = header.Header()
-        self.obj_motion = motion.PacketMotionData()
-        self.obj_telemetry = telemetry.PacketCarTelemetryData()
-
-        self.run()
+        self.handler = Handler
+        self.run_server()
+        self.main()
+        
+        
+    def run_server(self):
+        host_name = socket.gethostname()
+        host_addr = socket.gethostbyname(host_name)
+        
+        with socketserver.TCPServer((host_addr, self.port), self.handler) as httpd:
+            httpd.serve_forever()
 
     
-    def run(self):
+    def main(self):
         while True:
-            data = self.sock.recv(self.struct_size)
+            data = self.obj_sock.recv(self.struct_size)
             
             if data:
                 self.obj_header.unpack_struct(self.obj_header.packet_format, data)
@@ -61,13 +108,14 @@ class Main:
         
         curses_h, curses_w = stdscr.getmaxyx()
         
+        stdscr.clear()
+        
         for index, row in enumerate(display):
             pos_x = curses_w//2 - len(row)//2
             pos_y = curses_h//2 - len(display)//2 + index
             stdscr.addstr(pos_y, pos_x, row)
         
         stdscr.refresh()  
-        stdscr.clear()
             
 
     def motion(self, data):
@@ -118,6 +166,10 @@ class Main:
     def lobby(self, data):
         pass
         # print("Lobby Info Packet")
+        
+    def get_telemetry(self):
+        json_telemetry = self.obj_telemetry.get_telemetry(self.obj_header.m_playerCarIndex)
+        return json_telemetry
 
 
 main = Main()

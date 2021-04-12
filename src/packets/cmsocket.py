@@ -1,6 +1,6 @@
 import socket
 
-class Socket:
+class CMSocket:
 
     CM_SERVER = { "IP": "127.0.0.1", "PORT": 20777 }
 

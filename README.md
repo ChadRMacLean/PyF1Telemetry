@@ -11,3 +11,7 @@ My goal, once the underlying client system is built and handling of data is comp
 ### How long will it take?
 
 No idea, I am currently working on this pretty actively since it is fun an exciting but I do not know if this will be a long term project, unless there becomes a need for it outside of my own need.
+
+#### Resources
+
+Codemasters F1 2020 UDP Specifications - https://forums.codemasters.com/topic/50942-f1-2020-udp-specification/
